@@ -223,12 +223,13 @@ class Nubank:
 
         return {'keys': savings_acount['dict']['keys'], 'account_id': savings_acount['id']}
 
-    def create_pix_payment_qrcode(self, account_id: str, amount: float, pix_key: dict) -> dict:
+    def create_pix_payment_qrcode(self, account_id: str, amount: float, pix_key: dict, tx_id: str = '') -> dict:
         payload = {
             'createPaymentRequestInput': {
                 'amount': amount,
                 'pixAlias': pix_key.get('value'),
-                "savingsAccountId": account_id
+                "savingsAccountId": account_id,
+                'transactionId': tx_id,
             }
         }
 
@@ -243,3 +244,7 @@ class Nubank:
             'payment_code': data['brcode'],
             'qr_code': qr,
         }
+
+    def get_pix_status(self, transaction_id: str):
+        response = self._make_graphql_request('pix_data', {'type': 'TRANSFER_IN', 'id': transaction_id})
+        return response
